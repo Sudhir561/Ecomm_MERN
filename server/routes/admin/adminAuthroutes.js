@@ -2,9 +2,9 @@ const express=require('express');
 const router= new express.Router();
 
 const adminAuthController=require('../../controllers/admin/adminController')
-
+const adminUpload=require("../../multerconfig/admin/adminStorageConfig")
 // admin auth routes
-router.post('/register',adminAuthController.Register)
+router.post('/register',adminUpload.single('admin_profile'),adminAuthController.Register)
 
 
 

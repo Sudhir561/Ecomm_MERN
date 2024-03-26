@@ -12,7 +12,7 @@ app.use(express.json());
 
 //admin routes
 const adminAuthRoutes=require('./routes/admin/adminAuthRoutes');
-app.use('adminauth/api',adminAuthRoutes);
+app.use('/adminauth/api',adminAuthRoutes);
 
 
 
