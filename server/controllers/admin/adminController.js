@@ -53,6 +53,7 @@ exports.Register = async (req, res) => {
     }
 };
 
+//Login Controller
 exports.Login=async(req,res)=>{
 
     const{email,password}=req.body;
@@ -80,7 +81,7 @@ exports.Login=async(req,res)=>{
            else{
             // genearte token 
             const token= await validAdmin.generateAuthToken();
-            console.log(token);
+            //console.log(token);
             const result={"message":"login succesful",validAdmin,token}
             res.status(200).json(result)
            }
@@ -95,7 +96,7 @@ exports.Login=async(req,res)=>{
 }
 
 
-// admin verify
+// admin verify controller
 
 exports.AdminVerify = async function(req, res) {
     try {
@@ -117,3 +118,19 @@ exports.AdminVerify = async function(req, res) {
         res.status(500).json({ error: "Internal server error" });
     }
 };
+
+// logout controller
+
+exports.Logout= async(req,res)=>{
+    try {
+        req.rootUser.tokens=req.rootUser.tokens.filter(currentElement=>{
+            return currentElement.token!==req.token
+        }) 
+        req.rootUser.save();
+        res.status(200).json({message:"admin successfully logout"})
+    } catch (error) {
+        res.status(400).json(error)
+    }
+}
+
+

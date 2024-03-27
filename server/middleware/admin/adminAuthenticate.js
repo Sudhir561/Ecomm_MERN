@@ -30,7 +30,7 @@ const adminAuthenticate = async function(req, res, next) {
         req.userId = rootUser._id;
         req.token = token;
 
-        // Calling the next middleware function in the chain or calling the AdminVerify controller
+        // Calling the next middleware function in the chain or calling the  controller
         next();
     } catch (error) {
         // Handling errors that occur during authentication

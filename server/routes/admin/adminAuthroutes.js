@@ -19,6 +19,9 @@ router.post('/login', adminAuthController.Login);
 router.get('/adminverify', adminAuthenticate, adminAuthController.AdminVerify);
 
 
+router.get('/logout',adminAuthenticate,adminAuthController.Logout);
+
+
 
 
 module.exports=router;

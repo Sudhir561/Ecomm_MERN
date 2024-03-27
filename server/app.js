@@ -14,6 +14,10 @@ app.use(express.json());
 const adminAuthRoutes=require('./routes/admin/adminAuthRoutes');
 app.use('/adminauth/api',adminAuthRoutes);
 
+//product routes
+const productRoutes=require('./routes/product/productRoutes')
+app.use('/product/api',productRoutes)
+
 
 
 app.get('/',(req,res)=>{
