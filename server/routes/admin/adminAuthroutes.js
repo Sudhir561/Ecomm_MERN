@@ -6,6 +6,8 @@ const adminUpload=require("../../multerconfig/admin/adminStorageConfig")
 // admin auth routes
 router.post('/register',adminUpload.single('admin_profile'),adminAuthController.Register)
 
+router.post('/login',adminAuthController.Login)
+
 
 
 

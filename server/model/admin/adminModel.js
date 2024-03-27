@@ -1,5 +1,8 @@
 const mongoose=require('mongoose');
 const validator=require('validator');
+const bcrypt=require('bcryptjs');
+const jwt=require('jsonwebtoken');
+const secret_key=process.env.JWT_SECRET_KEY;
 
 // schema
 const adminSchema=new mongoose.Schema({
@@ -43,6 +46,28 @@ const adminSchema=new mongoose.Schema({
         }
     }]
 })
+
+//password hashing
+adminSchema.pre('save',async function(next){
+    if(this.isModified('password')){
+        this.password=await bcrypt.hash(this.password,10)
+        next();
+    }
+})
+
+// token generate
+
+adminSchema.methods.generateAuthToken=async function(){
+  try{
+    const newToken=jwt.sign({_id:this._id},secret_key,{expiresIn:"1d"})
+    this.tokens=this.tokens.concat({token:newToken});
+    this.save();
+    return newToken;
+  }catch(error){
+    // Handle the error accordingly, such as logging it or throwing it
+    throw error;
+  }
+}
 
 // model
 const Admin=new mongoose.model("admins",adminSchema)
