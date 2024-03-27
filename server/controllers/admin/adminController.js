@@ -1,4 +1,4 @@
-const Admin = require('../../model/admin/adminModel');
+const AdminDb = require('../../model/admin/adminModel');
 const cloudinary = require('../../Cloudinary/cloudinary');
 const bcrypt=require("bcryptjs")
 
@@ -13,13 +13,13 @@ exports.Register = async (req, res) => {
         }
 
         // Check if admin already exists with the same email
-        const preuser = await Admin.findOne({ email: email });
+        const preuser = await AdminDb.findOne({ email: email });
         if (preuser) {
             return res.status(400).json({ error: 'Admin already exists' });
         }
 
         // Check if mobile number is already registered
-        const mobileVerify = await Admin.findOne({ mobile: mobile });
+        const mobileVerify = await AdminDb.findOne({ mobile: mobile });
         if (mobileVerify) {
             return res.status(400).json({ error: 'Mobile number is already registered' });
         }
@@ -34,7 +34,7 @@ exports.Register = async (req, res) => {
         const upload = await cloudinary.uploader.upload(file); // Await the upload process
        
         // Create a new admin instance
-        const adminData = new Admin({
+        const adminData = new AdminDb({
             name,
             email,
             mobile,
@@ -65,13 +65,13 @@ exports.Login=async(req,res)=>{
     }
     else{
         // email exist in db
-        const validAdmin=await Admin.findOne({email:email});
+        const validAdmin=await AdminDb.findOne({email:email});
         if(!validAdmin){
             res.status(400).json({"error":"invalid details"})
         }
         else{
             // compare password 
-           const isMatch=bcrypt.compare(password,validAdmin);
+           const isMatch= await bcrypt.compare(password,validAdmin.password);
            // if not match
            if(!isMatch){
             res.status(400).json({"error":"invalid details"})
@@ -93,3 +93,27 @@ exports.Login=async(req,res)=>{
         res.status(400).json(error);
     }
 }
+
+
+// admin verify
+
+exports.AdminVerify = async function(req, res) {
+    try {
+        // Finding the admin details in the database based on the user ID stored in the request object
+        const adminVerify = await AdminDb.findOne({ _id: req.userId });
+        
+        // Checking if admin details are not found in the database
+        if (!adminVerify) {
+            return res.status(404).json({ error: "Admin not found" });
+        }
+        
+        // Sending a JSON response with the admin details if found
+        res.status(200).json(adminVerify);
+    } catch (error) {
+        // Handling errors that occur during admin verification
+        console.error("Error in AdminVerify:", error);
+        
+        // Sending a 500 status with an error message for internal server error
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
