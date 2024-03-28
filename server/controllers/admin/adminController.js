@@ -30,7 +30,7 @@ exports.Register = async (req, res) => {
         }
 
         // // File upload to Cloudinary
-        const file = req.file.path;
+        const file = req.file?.path;
         const upload = await cloudinary.uploader.upload(file); // Await the upload process
        
         // Create a new admin instance

@@ -16,7 +16,12 @@ app.use('/adminauth/api',adminAuthRoutes);
 
 //product routes
 const productRoutes=require('./routes/product/productRoutes')
-app.use('/product/api',productRoutes)
+app.use('/product/api',productRoutes);
+
+//user routes
+
+const userRoutes=require('./routes/user/userAuthRoutes');
+app.use('/userauth/api',userRoutes);
 
 
 
