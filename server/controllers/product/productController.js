@@ -118,3 +118,48 @@ exports.GetAllProducts = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 }
+
+//get single product .productid as params
+exports.getSingleProduct=async(req,res)=>{
+    try {
+        const productId=req.params.productid;
+        const product=await productdb.findOne({_id:productId})
+        res.status(200).json(product)
+    } catch (error) {
+        res.status(400).json(error)
+    }
+}
+
+//new arrival product(latest product)
+
+exports.getLatestProducts=async(req,res)=>{
+    try {
+        // sort in descending order to get latest product
+       const latestProducts=await productdb.find().sort({_id:-1}) 
+       res.status(200).json(latestProducts)
+    } catch (error) {
+        console.error('Error in getLatestProduct:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+//delete product
+exports.deleteProduct = async (req, res) => {
+    try {
+        const productId = req.params.productid;
+
+        // Find the product by ID and delete it
+        const deletedProduct = await productdb.findByIdAndDelete(productId);
+
+        // If no product was found with the given ID
+        if (!deletedProduct) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        // Respond with success message
+        res.status(200).json({ message: 'Product deleted successfully' });
+    } catch (error) {
+        console.error('Error in deleteProduct:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

@@ -17,4 +17,10 @@ router.post('/addproduct',[adminauthenticate,productuploads.single("productimage
 
 router.get('/getproducts',productController.GetAllProducts)
 
+router.get('/getsingleproduct/:productid',productController.getSingleProduct)
+
+router.get('/getlatestproducts',productController.getLatestProducts);
+
+router.get('/deleteproduct/:productid',adminauthenticate,productController.deleteProduct)
+
 module.exports=router;
