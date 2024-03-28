@@ -15,4 +15,6 @@ router.get('/getcategory',productController.GetCategory)
 
 router.post('/addproduct',[adminauthenticate,productuploads.single("productimage")],productController.AddProduct)
 
+router.get('/getproducts',productController.GetAllProducts)
+
 module.exports=router;

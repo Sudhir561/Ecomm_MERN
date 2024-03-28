@@ -76,3 +76,45 @@ exports.AddProduct=async(req,res)=>{
      res.status(400).json(error)
    }
 }
+
+
+// getall products with pagination and can be filter by category
+exports.GetAllProducts = async (req, res) => {
+    try {
+        const categoryid = req.query.categoryid || "";
+        const Query = {};
+        
+        // Check if categoryid is provided and not equal to "all"
+        if (categoryid && categoryid !== "all") {
+            Query.categoryid = categoryid;
+        }
+
+        const page = parseInt(req.query.page) || 1; // Parse page number as integer
+        const itemPerPage = 8;
+        const skip = (page - 1) * itemPerPage;
+
+        // Count total number of documents matching the query criteria
+        const count = await productdb.countDocuments(Query);
+
+        // Calculate total number of pages required for pagination
+        const totalPages = Math.ceil(count / itemPerPage);
+
+        // Fetch products based on query criteria, limit, and pagination
+        const allProducts = await productdb.find(Query)
+            .limit(itemPerPage)
+            .skip(skip);
+
+        // Respond with fetched products and pagination information
+        res.status(200).json({
+            allProducts,
+            pagination: {
+                totalProducts: count,
+                totalPages // Renamed countPage to totalPages for clarity
+            }
+        });
+    } catch (error) {
+        // Handle errors appropriately
+        console.error("Error in GetAllProducts:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
