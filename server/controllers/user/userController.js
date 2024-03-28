@@ -1,6 +1,9 @@
 const Usermodel = require("../../model/user/useModel");
 const cloudinary = require("../../Cloudinary/cloudinary");
+const bcrypt=require('bcryptjs');
+const validator=require('validator');
 
+//register controller
 exports.register = async (req, res) => {
   const { firstname, lastname, mobile, password, email, confirmpassword } =
     req.body;
@@ -62,4 +65,55 @@ exports.register = async (req, res) => {
   }
 };
 
+// login controller
 
+exports.login = async (req, res) => {
+  // Extract email and password from the request body
+  const { email, password } = req.body;
+  try {
+    // Check if email or password is missing
+    if (!email || !password) {
+      // If either email or password is missing
+      return res.status(400).json({ error: "Email and password are required." });
+    }
+    // Validate email format 
+    if (!validator.isEmail(email)) {
+
+      // If email format is invalid 
+      return res.status(400).json({ error: "Invalid email format." });
+    }
+
+    // Find user in the database based on the provided email
+    const user = await Usermodel.findOne({ email });
+
+    // Check if user exists
+    if (!user) {
+
+      // If user does not exist
+      return res.status(404).json({ error: "User not found." });
+
+    }
+
+    // Compare the provided password with the hashed password stored in the database
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    // Check if passwords match
+    if (!isMatch) {
+
+      // If passwords do not match, 
+      return res.status(400).json({ error: "Invalid password." });
+    }
+
+    // Generate a JSON Web Token (JWT) for the authenticated user
+    const token = await user.generateAuthToken();
+
+    // If authentication is successful, 
+    res.status(200).json({ success: true, user, token });
+
+    //handle error
+  } catch (error) {
+   
+    console.error("Error in login:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};

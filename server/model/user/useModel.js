@@ -1,6 +1,7 @@
 const mongoose=require('mongoose');
 const validator=require('validator');
 const bcrypt=require('bcryptjs');
+const jwt=require('jsonwebtoken')
 
 const secret_key=process.env.JWT_USER_SECRET_KEY;
 
@@ -59,7 +60,17 @@ userSchema.pre('save',async function(next){
     }
 })
 
-
+//generate token
+userSchema.methods.generateAuthToken=async function(req,res){
+  try {
+    const newtoken=jwt.sign({_id:this._id},secret_key,{expiresIn:"1d"});
+    this.tokens=this.tokens.concat({token:newtoken})
+    await this.save();
+    return newtoken
+  } catch (error) {
+    throw error
+  }
+}
 
 
 // model
