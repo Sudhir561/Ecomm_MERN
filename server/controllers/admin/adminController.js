@@ -123,6 +123,7 @@ exports.AdminVerify = async function(req, res) {
 
 exports.Logout= async(req,res)=>{
     try {
+        // remove the current verified token from tokens array
         req.rootUser.tokens=req.rootUser.tokens.filter(currentElement=>{
             return currentElement.token!==req.token
         }) 

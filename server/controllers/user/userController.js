@@ -110,10 +110,58 @@ exports.login = async (req, res) => {
     // If authentication is successful, 
     res.status(200).json({ success: true, user, token });
 
-    //handle error
+    //handle
   } catch (error) {
    
     console.error("Error in login:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 };
+
+// user verify controller
+exports.userVerify = async function(req, res) {
+  try {
+      // Finding the user details in the database based on the user ID stored in the request object
+      const userVerify = await Usermodel.findOne({ _id: req.userId });
+      
+      // Checking if user details are not found in the database
+      if (!userVerify) {
+          return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Sending a JSON response with the user details if found
+      res.status(200).json(userVerify);
+  } catch (error) {
+      // Handling errors that occur during user verification
+      console.error("Error in userVerify:", error);
+      
+      // Sending a 500 status with an error message for internal server error
+     return  res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// logout controller
+
+exports.logout = async (req, res) => {
+  try {
+      //remove the current token from the user's tokens array
+      req.rootUser.tokens = req.rootUser.tokens.filter(currentElement => {
+          return currentElement.token !== req.token;
+      });
+
+      // Save the updated user object
+      await req.rootUser.save();
+
+      // Return a success response
+      return res.status(200).json({ success: true, message: "User successfully logged out" });
+  } catch (error) {
+      // Return an error response if an error occurs
+      console.error("Error in user logout:", error);
+      return res.status(500).json({ success: false, error: "Internal server error" });
+  }
+};
+
+
+
+
+
