@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    
     lastname: {
       type: String,
       required: true,
@@ -33,6 +34,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     mobile: {
       type: String,
       required: true,
@@ -40,6 +42,7 @@ const userSchema = new mongoose.Schema(
       minLength: 10,
       maxLength: 10,
     },
+
     password: {
       type: String,
       required: true,
@@ -53,7 +56,13 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
+
+    // send token for reset password
+    verifytoken:{
+      type:String
+    }
   },
+
   { timestamps: true }
 );
 

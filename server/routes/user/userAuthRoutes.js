@@ -19,6 +19,10 @@ router.get('/userverify',userAuthenticate,userAuthController.userVerify)
 // logout routes
 router.get('/logout',userAuthenticate,userAuthController.logout)
 
+// send reset  password link in gmail
+
+router.get('/forgotpassword',userAuthController.forgotPassword)
+
 
 
 

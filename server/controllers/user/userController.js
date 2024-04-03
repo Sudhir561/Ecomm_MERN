@@ -2,6 +2,13 @@ const Usermodel = require("../../model/user/useModel");
 const cloudinary = require("../../Cloudinary/cloudinary");
 const bcrypt=require('bcryptjs');
 const validator=require('validator');
+const transporter=require('../../helper');
+const jwt=require('jsonwebtoken');
+const secret_key= process.env.JWT_USER_SECRET_KEY
+const path=require('path');
+const fs=require('fs');
+const ejs=require('ejs');
+
 
 //register controller
 exports.register = async (req, res) => {
@@ -158,6 +165,77 @@ exports.logout = async (req, res) => {
       // Return an error response if an error occurs
       console.error("Error in user logout:", error);
       return res.status(500).json({ success: false, error: "Internal server error" });
+  }
+};
+
+exports.forgotPassword = async (req, res) => {
+
+  // Extract email from request body
+  const email = req.body.email;
+
+  // Check if email is provided
+  if (!email) {
+      // Return error response if email is empty
+      return res.status(400).json({ error: "Email cannot be empty" });
+  }
+
+  try {
+      // Find user with provided email
+      const user = await Usermodel.findOne({ email: email });
+
+      // If user not found, return error response
+      if (!user) {
+          return res.status(404).json({ error: "User not found" });
+      }
+
+      // Generate JWT token for password reset with  2 min expiry time
+      const token = jwt.sign({ _id: user._id }, secret_key, { expiresIn: '120s' });
+
+      // Update user document with generated token
+      const setUserToken = await Usermodel.findByIdAndUpdate(user._id, { verifytoken: token }, { new: true });
+
+      // Read email template file
+      const emailTemplatePath = path.join(__dirname, "../../templateEmail/forgotTemplate.ejs");
+      const emailTemplateContent = fs.readFileSync(emailTemplatePath, "utf8");
+
+      
+     
+        // Set token and logo value in ejs file
+         const data = {
+          // Construct password reset link with user ID and token
+           passwordresetlink:`http://localhost:3000/resetpassword/${user.id}/${setUserToken.verifytoken}`,
+           logo:"https://cdn-icons-png.flaticon.com/128/732/732200.png"
+           }
+
+  
+
+      // Render email template with dynamic data
+      const renderedTemplate = ejs.render(emailTemplateContent, data);
+
+      // Configure email options
+      const mailOptions = {
+          from: process.env.EMAIL_ADDRESS,
+          to: email,
+          subject: "Password Reset Link",
+          html: renderedTemplate
+      };
+
+      // Send email using nodemailer transporter
+      transporter.sendMail(mailOptions, (err, info) => {
+          // Handle email sending errors
+          if (err) {
+              console.error("Error sending email:", err);
+              return res.status(500).json({ error: "Failed to send email" });
+
+          } else {
+              console.log("Email sent:", info.response);
+              return res.status(200).json({ message: "Email sent successfully" });
+          }
+      });
+  } catch (error) {
+      // Handle errors in try block
+      console.error("Error in forgotPassword:", error);
+      res.status(500).json({ error: "Internal server error" });
   }
 };
 
