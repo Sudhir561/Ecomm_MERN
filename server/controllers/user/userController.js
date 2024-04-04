@@ -168,6 +168,8 @@ exports.logout = async (req, res) => {
   }
 };
 
+
+//send password reset link controller
 exports.forgotPassword = async (req, res) => {
 
   // Extract email from request body
@@ -189,10 +191,12 @@ exports.forgotPassword = async (req, res) => {
       }
 
       // Generate JWT token for password reset with  2 min expiry time
-      const token = jwt.sign({ _id: user._id }, secret_key, { expiresIn: '120s' });
+      const token = jwt.sign({ _id: user._id }, secret_key, { expiresIn: '1h' });
 
       // Update user document with generated token
       const setUserToken = await Usermodel.findByIdAndUpdate(user._id, { verifytoken: token }, { new: true });
+
+      console.log(setUserToken);
 
       // Read email template file
       const emailTemplatePath = path.join(__dirname, "../../templateEmail/forgotTemplate.ejs");
@@ -235,9 +239,78 @@ exports.forgotPassword = async (req, res) => {
   } catch (error) {
       // Handle errors in try block
       console.error("Error in forgotPassword:", error);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: error});
   }
 };
+
+// verify user and token after  clicking on password reset link 
+exports.userVerifyPasswordToken = async (req, res) => {
+  const { id, token } = req.params;
+
+  try {
+      // Check if user with provided ID and token exists
+      const validUser = await Usermodel.findOne({ _id: id, verifytoken: token });
+      if (!validUser) {
+          // If user or token is invalid, return error response
+          return res.status(404).json({ success: false, error: "User or token not found" });
+      }
+
+      // Verify the token
+      const verifyToken = await jwt.verify(token, secret_key);
+
+      // Check if the token verification is successful
+      if (!verifyToken) {
+          // If token verification fails, return error response
+          return res.status(401).json({ success: false, error: "Invalid token" });
+      }
+
+      // Return success response with valid user if token is verified
+      return res.status(200).json({ success: true, validUser });
+  } catch (error) {
+      // Handle any errors that occur during the process
+      console.error("Error in userVerifyPasswordToken:", error);
+      return res.status(500).json({ success: false, error: error });
+  }
+};
+
+// chnage password controller
+exports.changePassword = async (req, res) => {
+  const { id, token } = req.params;
+  const { password } = req.body;
+
+  try {
+      // Find the user by ID and verify the token
+      const validUser = await Usermodel.findOne({ _id: id, verifytoken: token });
+
+      if (!validUser) {
+          return res.status(404).json({ success: false, error: "User or token not found" });
+      }
+
+      // Verify the token
+      const verifyToken = await jwt.verify(token, secret_key);
+
+      if (!verifyToken) {
+          return res.status(401).json({ success: false, error: "Invalid token" });
+      }
+
+      // Validate the new password
+      if (!password) {
+          return res.status(400).json({ success: false, error: "Password is required" });
+      }
+
+      // Hash the new password
+      const newPassword = await bcrypt.hash(password, 10);
+
+      // Update the user's password in the database
+      await Usermodel.findByIdAndUpdate(id, { password: newPassword });
+
+      return res.status(200).json({ success: true, message: "Password reset successful" });
+  } catch (error) {
+    console.error("error in changing password",error)
+      return res.status(500).json({ success: false, error});
+  }
+};
+
 
 
 
