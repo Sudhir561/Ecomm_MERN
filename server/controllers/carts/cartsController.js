@@ -79,11 +79,60 @@ exports.getCartsValue = async (req, res) => {
                 }
             }
         ]);
-        
+        if(getCarts.length===0){
+            return res.status(404).json({error:"cart is empty"});
+        }
         // Return the cart details as response
         res.status(200).json(getCarts);
     } catch (error) {
        
+        res.status(400).json(error);
+    }
+}
+
+// remove single item 
+
+exports.removeSingleItem = async (req, res) => {
+    const { id } = req.params; // Extracting product ID from request parameters
+
+    try {
+        // Finding the product in the database by ID
+        const productFind = await productdb.findOne({ _id: id });
+        
+        // If product is not found, return a 404 error response
+        if (!productFind) {
+            return res.status(404).json({ error: "No product found" });
+        }
+
+        // Finding the cart item in the database by user ID and product ID
+        const carts = await CartsDb.findOne({ userid: req.userId, productid: productFind._id });
+
+        if (carts?.quantity > 1) {
+            // If quantity in carts is greater than 1, decrement the quantity in the carts
+            carts.quantity = carts.quantity - 1;
+            await carts.save();
+
+            // Increment the quantity of the product
+            productFind.quantity = productFind.quantity + 1;
+            await productFind.save();
+
+            return res.status(200).json({ message: "Product quantity successfully decremented", carts });
+
+        } else if (carts?.quantity === 1) {
+            // If cart quantity is 1, remove the item from the cart
+            const deleteItem = await CartsDb.findByIdAndDelete({ _id: carts._id });
+
+            // Increment the quantity of the product
+            productFind.quantity = productFind.quantity + 1;
+            await productFind.save();
+
+            return res.status(200).json({ message: "Product removed from cart", deleteItem });
+        } else {
+            // If the product is not added to the cart or quantity is less than 1, return an error response
+            return res.status(400).json({ error: "Product is not added in the cart" });
+        }
+    } catch (error) {
+        
         res.status(400).json(error);
     }
 }

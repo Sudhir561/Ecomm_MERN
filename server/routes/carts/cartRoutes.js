@@ -5,6 +5,10 @@ const userAuthenticate=require('../../middleware/user/userAuthenticate');  // mi
 
 // addtocarts routes (by providing product id )
 router.post('/addtocarts/:id',userAuthenticate,cartsController.addToCart)
-
+// getCart routes
 router.get('/getcarts',userAuthenticate,cartsController.getCartsValue)
+
+// remove single item 
+
+router.delete("/removesingleitem/:id",userAuthenticate,cartsController.removeSingleItem)
 module.exports=router;

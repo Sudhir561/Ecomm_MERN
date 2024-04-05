@@ -1,6 +1,6 @@
 const jwt=require('jsonwebtoken');  
 const secret_key=process.env.JWT_USER_SECRET_KEY;
-const UserModel=require('../../model/user/useModel')
+const UserModel=require('../../model/user/userModel')
 
 
 /// Defining the middleware function for authenticating  users

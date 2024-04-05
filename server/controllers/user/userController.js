@@ -1,4 +1,4 @@
-const Usermodel = require("../../model/user/useModel");
+const Usermodel = require("../../model/user/userModel");
 const cloudinary = require("../../Cloudinary/cloudinary");
 const bcrypt=require('bcryptjs');
 const validator=require('validator');
