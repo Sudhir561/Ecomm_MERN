@@ -136,3 +136,40 @@ exports.removeSingleItem = async (req, res) => {
         res.status(400).json(error);
     }
 }
+
+
+exports.removeAllItems = async (req, res) => {
+    const { id } = req.params; // Extracting product ID from request parameters
+
+    try {
+        // Finding the product in the database by ID
+        const productFind = await productdb.findOne({ _id: id });
+        
+        // If product is not found, return a 404 error response
+        if (!productFind) {
+            return res.status(404).json({ error: "No product found" });
+        }
+
+        // Finding the cart item in the database by user ID and product ID
+        const carts = await CartsDb.findOne({ userid: req.userId, productid: productFind._id });
+        
+        // If cart is empty,
+        if (!carts) {
+            return res.status(400).json({ error: "Cart is empty" });
+        }
+
+        // Remove all items of the specific product from the cart
+        const deleteItems = await CartsDb.findByIdAndDelete({ _id: carts._id });
+
+        // Increment the quantity of the product by cart quantity
+        productFind.quantity = productFind.quantity + carts.quantity;
+        await productFind.save();
+
+        
+        res.status(200).json({ message: "All items removed from cart", deleteItems });
+    } catch (error) {
+       
+        res.status(400).json(error);
+    }
+}
+

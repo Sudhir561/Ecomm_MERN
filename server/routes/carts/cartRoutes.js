@@ -11,4 +11,9 @@ router.get('/getcarts',userAuthenticate,cartsController.getCartsValue)
 // remove single item 
 
 router.delete("/removesingleitem/:id",userAuthenticate,cartsController.removeSingleItem)
+
+//
+router.delete('/removeallitems/:id',userAuthenticate,cartsController.removeAllItems)
+
 module.exports=router;
+
