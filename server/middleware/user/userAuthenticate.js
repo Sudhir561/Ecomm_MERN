@@ -29,6 +29,7 @@ const userAuthenticate = async function(req, res, next) {
         req.rootUser = rootUser;
         req.userId = rootUser._id;
         req.token = token;
+        req.userMainId=rootUser.id;
 
         // Calling the next middleware function in the chain or calling the  controller
         next();

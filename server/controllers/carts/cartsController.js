@@ -33,7 +33,7 @@ exports.addToCart = async (req, res) => {
                 
                 // Return a success response with the updated cart item
                 return res.status(200).json({ message: "Product successfully incremented in cart", carts });
-                
+
             } else {
                 // Create a new cart item
                 const newCart = new CartsDb({
@@ -56,6 +56,34 @@ exports.addToCart = async (req, res) => {
         }
     } catch (error) {
         // If there's an error, return a 400 error response with the error message
+        res.status(400).json(error);
+    }
+}
+
+// getCartsDetails controller
+exports.getCartsValue = async (req, res) => {
+    try {
+        // Perform aggregation to get cart details along with product details
+        const getCarts = await CartsDb.aggregate([
+            // Match carts for a specific user who is added the product in carts
+            {
+                $match: { userid: req.userMainId }
+            },
+            // Lookup product details based on productid
+            {
+                $lookup: {
+                    from: "productsmodels", // Collection to perform the lookup
+                    localField: "productid", // Field in the current collection
+                    foreignField: "_id", // Field in the target collection
+                    as: "productDetails" // Alias for the joined data
+                }
+            }
+        ]);
+        
+        // Return the cart details as response
+        res.status(200).json(getCarts);
+    } catch (error) {
+       
         res.status(400).json(error);
     }
 }

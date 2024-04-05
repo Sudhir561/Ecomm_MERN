@@ -6,4 +6,5 @@ const userAuthenticate=require('../../middleware/user/userAuthenticate');  // mi
 // addtocarts routes (by providing product id )
 router.post('/addtocarts/:id',userAuthenticate,cartsController.addToCart)
 
+router.get('/getcarts',userAuthenticate,cartsController.getCartsValue)
 module.exports=router;
