@@ -23,6 +23,9 @@ app.use('/product/api',productRoutes);
 const userRoutes=require('./routes/user/userAuthRoutes');
 app.use('/userauth/api',userRoutes);
 
+// cart
+const cartRoutes=require('./routes/carts/cartRoutes')
+app.use('/carts/api',cartRoutes)
 
 
 app.get('/',(req,res)=>{
