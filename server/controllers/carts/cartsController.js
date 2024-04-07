@@ -137,7 +137,7 @@ exports.removeSingleItem = async (req, res) => {
     }
 }
 
-
+// remove all items of specific product
 exports.removeAllItems = async (req, res) => {
     const { id } = req.params; // Extracting product ID from request parameters
 
@@ -172,4 +172,29 @@ exports.removeAllItems = async (req, res) => {
         res.status(400).json(error);
     }
 }
+
+//
+
+exports.deleteCartData = async (req, res) => {
+    try {
+        // Count the number of documents in the cart collection
+        const count = await CartsDb.countDocuments();
+
+        // If cart is already empty, return a 400 error response
+        if (!count) {
+            return res.status(400).json({ error: "Cart is already empty" });
+        }
+
+        // Delete all cart data for the current user
+        const deleteCart = await CartsDb.deleteMany({ userid: req.userId });
+
+        // Return success message
+        res.status(200).json({ message: "All data deleted, cart is empty now", deleteCart });
+    } catch (error) {
+        // Handle errors
+        res.status(400).json(error);
+    }
+}
+
+
 
