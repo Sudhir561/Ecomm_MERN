@@ -220,11 +220,37 @@ exports.getProductReviews = async (req, res) => {
 
         // If no reviews found, return a 404 error response
         if (!productReviews || productReviews.length === 0) {
-            return res.status(404).json({ error: "No reviews found for this product" });
+            return res.status(404).json({ error: "No review added for this product" });
         }
 
         // Return the product reviews
         res.status(200).json(productReviews);
+    } catch (error) {
+        // Handle errors
+        res.status(400).json(error);
+    }
+}
+
+
+exports.deleteProductReview = async (req, res) => {
+    const { reviewid } = req.params;
+
+    try {
+        // Check if reviewid is provided
+        if (!reviewid) {
+            return res.status(400).json({ error: "Review ID is required" });
+        }
+
+        // Find and delete the review by reviewid
+        const deleteReview = await ProductReviewDb.findByIdAndDelete(reviewid);
+
+        // If no review found with the given reviewid,
+        if (!deleteReview) {
+            return res.status(404).json({ error: "Review not found" });
+        }
+
+        // Return a success message along with the deleted review
+        res.status(200).json({ message: "Review successfully deleted", deleteReview });
     } catch (error) {
         // Handle errors
         res.status(400).json(error);

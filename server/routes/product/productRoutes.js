@@ -29,4 +29,8 @@ router.post("/productreview/:productid",userAuthenticate,productController.produ
 // get product reviews 
 router.get("/getproductreviews/:productid",userAuthenticate,productController.getProductReviews);
 
+// delete product review
+
+router.delete("/deleteproductreview/:reviewid",userAuthenticate,productController.deleteProductReview);
+
 module.exports=router;
