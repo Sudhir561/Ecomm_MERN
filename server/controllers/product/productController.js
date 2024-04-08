@@ -212,7 +212,7 @@ exports.getProductReviews = async (req, res) => {
     try {
         // Check if productId is provided
         if (!productId) {
-            return res.status(404).json({ error: "No product found" });
+            return res.status(400).json({ error: "productId is required" });
         }
         
         // Find product reviews by productId

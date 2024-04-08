@@ -24,6 +24,9 @@ router.get('/logout',adminAuthenticate,adminAuthController.Logout);
 // route for get all users
 router.get('/getallusers',adminAuthenticate,adminAuthController.getAllUsers);
 
+// route for delete user
+router.delete('/userdelete/:userid',adminAuthenticate,adminAuthController.deleteUser)
+
 
 
 

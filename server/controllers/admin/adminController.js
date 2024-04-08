@@ -167,3 +167,23 @@ exports.getAllUsers=async(req,res)=>{
     res.status(400).json(error)
    }
 }
+
+exports.deleteUser = async (req, res) => {
+    const { userid } = req.params;
+
+    try {
+        // Find and delete the user by ID
+        const deletedUser = await Users.findByIdAndDelete({ _id: userid });
+
+        // If user is not found, return a 404 error response
+        if (!deletedUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Return success message along with the deleted user
+        res.status(200).json({ message: "User successfully deleted", deletedUser });
+    } catch (error) {
+        // Handle errors
+        res.status(400).json(error);
+    }
+}
