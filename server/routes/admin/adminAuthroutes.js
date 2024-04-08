@@ -18,8 +18,13 @@ router.post('/login', adminAuthController.Login);
 // and calling the 'AdminVerify' controller function from the 'adminAuthController' 
 router.get('/adminverify', adminAuthenticate, adminAuthController.AdminVerify);
 
-
+// Route for admin logout
 router.get('/logout',adminAuthenticate,adminAuthController.Logout);
+
+// route for get all users
+router.get('/getallusers',adminAuthenticate,adminAuthController.getAllUsers);
+
+
 
 
 

@@ -1,6 +1,7 @@
 const AdminDb = require('../../model/admin/adminModel');
 const cloudinary = require('../../Cloudinary/cloudinary');
-const bcrypt=require("bcryptjs")
+const bcrypt=require("bcryptjs");
+const Users=require('../../model/user/userModel')
 
 // Register controller
 exports.Register = async (req, res) => {
@@ -135,3 +136,34 @@ exports.Logout= async(req,res)=>{
 }
 
 
+//get All Users
+
+exports.getAllUsers=async(req,res)=>{
+    const page = parseInt(req.query.page) || 1; // Parse page number as integer
+    const itemPerPage = 4;
+    const skip = (page - 1) * itemPerPage;
+  
+   try {
+     // Count total number of documents in Users model
+     const count = await Users.countDocuments();
+
+     // Calculate total number of pages required for pagination
+     const totalPages = Math.ceil(count / itemPerPage);
+ 
+     
+     const allUsers = await Users.find()
+         .limit(itemPerPage)
+         .skip(skip);
+         
+         res.status(200).json({
+            allUsers,
+            pagination: {
+                totalUsers: count,
+                totalPages 
+            }
+        });
+ 
+   } catch (error) {
+    res.status(400).json(error)
+   }
+}
