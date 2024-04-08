@@ -173,8 +173,8 @@ exports.removeAllItems = async (req, res) => {
     }
 }
 
-//
 
+// empty cart when order placed
 exports.deleteCartData = async (req, res) => {
     try {
         // Count the number of documents in the cart collection

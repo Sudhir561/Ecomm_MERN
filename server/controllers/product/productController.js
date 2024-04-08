@@ -1,6 +1,7 @@
 const categorydb = require('../../model/product/productCategoryModel');
 const cloudinary=require('../../Cloudinary/cloudinary');
 const productdb = require('../../model/product/productModel');
+const ProductReviewDb=require('../../model/product/productReviewModel')
 
 exports.AddCategory = async (req, res) => {
     const { categoryname, description } = req.body;
@@ -163,3 +164,69 @@ exports.deleteProduct = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+// add product Review
+exports.productReview = async (req, res) => {
+    const productId = req.params.productid;
+    const { username, rating, description } = req.body;
+
+    // Check if all required fields are provided
+    if (!username || !rating || !description || !productId) {
+        return res.status(400).json({ error: "All fields are required" });
+    }
+
+    try {
+        // Find the product by ID
+        const product = await productdb.findById(productId);
+        
+        // If product not found, return a 404 error response
+        if (!product) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        // Create a new product review instance
+        const productReview = new ProductReviewDb({
+            userid: req.userMainId,
+            productid: productId,
+            username,
+            rating,
+            description
+        });
+
+        // Save the product review to the database
+        await productReview.save();
+
+        // Return success message and the product review
+        res.status(201).json({ message: "Product review added", productReview });
+    } catch (error) {
+        // Handle errors
+        res.status(400).json(error);
+    }
+}
+
+// get product Reviews controller
+
+exports.getProductReviews = async (req, res) => {
+    const productId = req.params.productid;
+
+    try {
+        // Check if productId is provided
+        if (!productId) {
+            return res.status(404).json({ error: "No product found" });
+        }
+        
+        // Find product reviews by productId
+        const productReviews = await ProductReviewDb.find({ productid: productId });
+
+        // If no reviews found, return a 404 error response
+        if (!productReviews || productReviews.length === 0) {
+            return res.status(404).json({ error: "No reviews found for this product" });
+        }
+
+        // Return the product reviews
+        res.status(200).json(productReviews);
+    } catch (error) {
+        // Handle errors
+        res.status(400).json(error);
+    }
+}
