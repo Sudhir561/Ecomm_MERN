@@ -40,7 +40,7 @@ header{
             }
 
             .hamburgur{
-                display:block !important;
+                display:none ;
                 cursor: pointer;
                 font-size: 25px;
                 padding-top: 4px;
@@ -70,7 +70,7 @@ header{
         }
        
         .right  .hamburgur{
-            display:block;
+            display:block !important;
         }
        
         .right .cart_btn{
